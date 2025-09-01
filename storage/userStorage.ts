@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { UserProfile } from '../types';
+import { UserProfile } from '../components/constants/types';
 
 const USER_PROFILE_KEY = 'USER_PROFILE';
 

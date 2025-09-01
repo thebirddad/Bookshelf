@@ -1,11 +1,11 @@
 import { View, Text, FlatList, Button, StyleSheet } from 'react-native';
 import { useEffect, useState } from 'react';
-import BookCard from '../components/BookCard';
-import { Book, BookStatus } from '../types';
-import { loadBooks } from '../storage/bookStorage';
+import BookCard from '../../components/items/BookCard';
+import { Book, BookStatus } from '../../components/constants/types';
+import { loadBooks } from '../../storage/bookStorage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../../App';
 
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 

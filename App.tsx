@@ -1,17 +1,17 @@
 // App.tsx
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from './screens/HomeScreen';
-import AddBookScreen from './screens/AddBookScreen';
-import BagScreen from './screens/BagScreen';
-import NightstandScreen from './screens/NightstandScreen';
-import ShelfScreen from './screens/ShelfScreen';
-import UserProfileScreen from './screens/UserProfileScreen';
-import CreateUserScreen from './screens/CreateUserScreen';
-import EditBookScreen from './screens/EditBookScreen';
+import HomeScreen from './screens/Navigation/HomeScreen';
+import AddBookScreen from './screens/Books/AddBookScreen';
+import BagScreen from './screens/Bag/BagScreen';
+import NightstandScreen from './screens/Nighstand/NightstandScreen';
+import ShelfScreen from './screens/Shelf/ShelfScreen';
+import UserProfileScreen from './screens/User/UserProfileScreen';
+import CreateUserScreen from './screens/User/CreateUserScreen';
+import EditBookScreen from './screens/Books/EditBookScreen';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
-import OwnedNightstandScreen from './screens/OwnedNightstandScreen';
+import OwnedNightstandScreen from './screens/Nighstand/OwnedNightstandScreen';
 
 export type RootStackParamList = {
   Home: undefined;

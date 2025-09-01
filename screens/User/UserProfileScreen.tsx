@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ActivityIndicator, StyleSheet, Image, ScrollView, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { loadUserProfile, saveUserProfile } from '../storage/userStorage';
-import { UserProfile, genre as GenreType } from '../types';
+import { loadUserProfile, saveUserProfile } from '../../storage/userStorage';
+import { recalculateTotalPagesRead } from '../../storage/bookStorage';
+import { UserProfile, genre as GenreType } from '../../components/constants/types';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../../App';
 import { Picker } from '@react-native-picker/picker';
-import { getLevelFromXP } from '../components/levels';
+import { getLevelFromXP } from '../../components/constants/levels';
 
 type UserProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UserProfile'>;
 
@@ -26,11 +27,14 @@ export default function UserProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState<GenreType>('Fantasy');
 
+
   useEffect(() => {
-    loadUserProfile().then(profile => {
+    loadUserProfile().then(async profile => {
       if (!profile || !profile.username) {
         navigation.replace('CreateUser');
       } else {
+        const totalPagesRead = await recalculateTotalPagesRead();
+        profile.totalPagesRead = totalPagesRead;
         setUser(profile);
       }
       setLoading(false);
@@ -43,6 +47,7 @@ export default function UserProfileScreen() {
       Alert.alert('Already Added', 'This genre is already in your favorites.');
       return;
     }
+  
     const updatedUser = {
       ...user,
       favoriteGenres: [...user.favoriteGenres, selectedGenre],
@@ -76,9 +81,9 @@ export default function UserProfileScreen() {
         </View>
       )}
       {user.bio ? <Text style={styles.bio}>Bio: {user.bio}</Text> : null}
-<Text>
-  Level: {getLevelFromXP(user.experiencePoints)}
-</Text>
+      <Text>
+        Level: {getLevelFromXP(user.experiencePoints)}
+      </Text>
       <Text>XP: {user.experiencePoints}</Text>
       <Text>Total Books Read: {user.totalBooksRead}</Text>
       <Text>Total Pages Read: {user.totalPagesRead}</Text>

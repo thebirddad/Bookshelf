@@ -1,10 +1,10 @@
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useState } from 'react';
-import { UserProfile } from '../types';
-import { saveUserProfile } from '../storage/userStorage';
+import { UserProfile } from '../../components/constants/types';
+import { saveUserProfile } from '../../storage/userStorage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList } from '../../App';
 
 type CreateUserScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'CreateUser'>;
 

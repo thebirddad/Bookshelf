@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Book } from '../types';
+import { Book } from '../constants/types';
 
 type BookCardProps = {
   book: Book;

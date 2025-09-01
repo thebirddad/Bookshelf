@@ -21,6 +21,7 @@ export type Book = {
   publisher?: string; // optional field to store the book's publisher
   genre?: string; // optional field to store the book's genre
   language?: string; // optional field to store the book's language
+  hidden?: boolean; // optional field to mark the book as hidden
 };
 
 export type BagSkin = {
@@ -42,12 +43,13 @@ export type Bag = {
 };
 
 export type NightStandSkin = {
-  id: string;          // unique identifier for the skin
-  name: string;        // display name (e.g., "Starting Nightstand", "Wooden Nightstand", "Modern Nightstand")
-  color?: string;      // hex code or named color
-  imageUrl?: string;   // optional image representing the skin
-  requiredXP?: number; // optional XP threshold to unlock this skin
-  unlocked?: boolean;  // whether the user has unlocked this skin
+  id: string;
+  name: string;
+  color?: string;
+  imageUrl?: string;
+  requiredXP?: number;
+  unlocked?: boolean;
+  isSelected?: boolean;
 };
 
 export type NightStand = {
@@ -108,6 +110,7 @@ export type UserProfile = {
     nightStandSkins: NightStandSkin[];
     shelfSkins: ShelfSkin[];
   };
+  selectedNightStandSkinId?: string; // <-- add this
 };
 
 
