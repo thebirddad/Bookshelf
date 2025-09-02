@@ -8,7 +8,6 @@ import NightstandScreen from './screens/Nighstand/NightstandScreen';
 import ShelfScreen from './screens/Shelf/ShelfScreen';
 import UserProfileScreen from './screens/User/UserProfileScreen';
 import CreateUserScreen from './screens/User/CreateUserScreen';
-import EditBookScreen from './screens/Books/EditBookScreen';
 import { Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import OwnedNightstandScreen from './screens/Nighstand/OwnedNightstandScreen';
@@ -78,11 +77,6 @@ export default function App() {
             name="CreateUser"
             component={CreateUserScreen}
             options={{ title: 'Adding a user' }}
-          />
-          <Stack.Screen
-            name="EditBook"
-            component={EditBookScreen}
-            options={{ title: 'Edit a book' }}
           />
           <Stack.Screen
   name="OwnedNightstand"

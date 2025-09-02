@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { Book } from '../constants/types';
 
 type BookCardProps = {
@@ -8,23 +8,26 @@ type BookCardProps = {
   onHide?: () => void;
   onUnhide?: () => void;
   showHidden?: boolean;
+  onPress?: () => void;
 };
 
-export default function BookCard({ book, isHidden, onHide, onUnhide, showHidden }: BookCardProps) {
+export default function BookCard({ book, isHidden, onHide, onUnhide, showHidden, onPress }: BookCardProps) {
   return (
-    <View style={styles.book}>
-      <Text style={styles.bookTitle} numberOfLines={2}>{book.title}</Text>
-      <Text style={styles.bookAuthor} numberOfLines={1}>{book.author}</Text>
-      {showHidden && isHidden && onUnhide ? (
-        <TouchableOpacity onPress={onUnhide} style={styles.hideIcon}>
-          <Text style={{ fontSize: 18 }}>🔓</Text>
-        </TouchableOpacity>
-      ) : !isHidden && onHide ? (
-        <TouchableOpacity onPress={onHide} style={styles.hideIcon}>
-          <Text style={{ fontSize: 18 }}>🔒</Text>
-        </TouchableOpacity>
-      ) : null}
-    </View>
+    <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+      <View style={styles.book}>
+        <Image source={{ uri: book.coverImageUrl }} style={styles.bookCover} />
+        <Text style={styles.bookTitle} numberOfLines={2}>{book.title}</Text>
+        {showHidden && isHidden && onUnhide ? (
+          <TouchableOpacity onPress={onUnhide} style={styles.hideIcon}>
+            <Text style={{ fontSize: 18 }}>🔓</Text>
+          </TouchableOpacity>
+        ) : !isHidden && onHide ? (
+          <TouchableOpacity onPress={onHide} style={styles.hideIcon}>
+            <Text style={{ fontSize: 18 }}>🔒</Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
+    </TouchableOpacity>
   );
 }
 
@@ -63,5 +66,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 4,
     right: 4,
+  },
+  bookCover: {
+    width: 120,
+    height: 180,
+    marginBottom: 16,
   },
 });

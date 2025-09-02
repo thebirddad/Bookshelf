@@ -53,10 +53,10 @@ export type NightStandSkin = {
 };
 
 export type NightStand = {
-    id: string; // unique ID for each nightstand entry
-    name: string; // name of the nightstand
-    dateCreated: string; // date when the nightstand was created
-    books: Book[]; // array of books in the nightstand
+  id: string; // unique ID for each nightstand entry
+  name: string; // name of the nightstand
+  dateCreated: string; // date when the nightstand was created
+  books: Book[]; // array of books in the nightstand
 }
 
 export type ShelfSkin = {
@@ -69,16 +69,21 @@ export type ShelfSkin = {
 };
 
 export type Shelf = {
-    id: string; // unique ID for each shelf entry
-    name: string; // name of the shelf
-    dateCreated: string; // date when the shelf was created
-    books: Book[]; // array of books in the shelf
+  id: string; // unique ID for each shelf entry
+  name: string; // name of the shelf
+  dateCreated: string; // date when the shelf was created
+  books: Book[]; // array of books in the shelf
 }
 
 export type UserProfile = {
   username: string;
-  avatarUrl?: string;
-  bio?: string;
+  avatar?: {
+    body: string;
+    hair: string;
+    facialHair: string | null;
+    face: string;
+    clothes: string;
+  }; bio?: string;
 
   // Stats & gamification
   experiencePoints: number;
@@ -115,49 +120,49 @@ export type UserProfile = {
 
 
 export type genre =
-  | 'Fantasy'  
-    | 'Science Fiction'
-    | 'Mystery'
-    | 'Thriller'
-    | 'Romance'
-    | 'Horror'
-    | 'Historical Fiction'
-    | 'Non-Fiction'
-    | 'Biography'
-    | 'Self-Help'
-    | 'Health & Wellness'
-    | 'Travel'
-    | 'Children\'s'
-    | 'Young Adult'
-    | 'Classics'
-    | 'Graphic Novels'
-    | 'Poetry'
-    | 'Religion & Spirituality'
-    | 'Science & Technology'
-    | 'Art & Photography'
-    | 'Cookbooks'
-    | 'Business & Economics'
-    | 'Politics & Social Sciences'
-    | 'Education'
-    | 'Comics & Humor'
-    | 'Drama'
-    | 'Short Stories'
-    | 'Anthologies'
-    | 'Dystopian'
-    | 'Adventure'
-    | 'Western' 
-    | 'Memoir'
-    | 'True Crime'
-    | 'Philosophy'
-    | 'Psychology'
-    | 'Environment'
-    | 'Parenting'
-    | 'Crafts & Hobbies'
-    | 'Sports & Recreation'
-    | 'Music'
-    | 'Film & Television'
-    | 'LGBTQ+'
-    | 'Cultural Studies'
-    | 'Mythology'
-    | 'Folklore'
-    | 'Other';
+  | 'Fantasy'
+  | 'Science Fiction'
+  | 'Mystery'
+  | 'Thriller'
+  | 'Romance'
+  | 'Horror'
+  | 'Historical Fiction'
+  | 'Non-Fiction'
+  | 'Biography'
+  | 'Self-Help'
+  | 'Health & Wellness'
+  | 'Travel'
+  | 'Children\'s'
+  | 'Young Adult'
+  | 'Classics'
+  | 'Graphic Novels'
+  | 'Poetry'
+  | 'Religion & Spirituality'
+  | 'Science & Technology'
+  | 'Art & Photography'
+  | 'Cookbooks'
+  | 'Business & Economics'
+  | 'Politics & Social Sciences'
+  | 'Education'
+  | 'Comics & Humor'
+  | 'Drama'
+  | 'Short Stories'
+  | 'Anthologies'
+  | 'Dystopian'
+  | 'Adventure'
+  | 'Western'
+  | 'Memoir'
+  | 'True Crime'
+  | 'Philosophy'
+  | 'Psychology'
+  | 'Environment'
+  | 'Parenting'
+  | 'Crafts & Hobbies'
+  | 'Sports & Recreation'
+  | 'Music'
+  | 'Film & Television'
+  | 'LGBTQ+'
+  | 'Cultural Studies'
+  | 'Mythology'
+  | 'Folklore'
+  | 'Other';

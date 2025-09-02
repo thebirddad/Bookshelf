@@ -8,6 +8,12 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import { Picker } from '@react-native-picker/picker';
 import { getLevelFromXP } from '../../components/constants/levels';
+import HAIR from '../../components/constants/avatar/hair';
+import BODY from '../../components/constants/avatar/body';
+import FACIAL_HAIR from '../../components/constants/avatar/facial_hair';
+import FACE from '../../components/constants/avatar/face';
+import CLOTHES from '../../components/constants/avatar/clothes';
+
 
 type UserProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'UserProfile'>;
 
@@ -26,6 +32,7 @@ export default function UserProfileScreen() {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedGenre, setSelectedGenre] = useState<GenreType>('Fantasy');
+  const [showGenreCard, setShowGenreCard] = useState(false);
 
 
   useEffect(() => {
@@ -68,18 +75,20 @@ export default function UserProfileScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.header}>{user.username}</Text>
-      {user.avatarUrl && (
-        <View style={styles.avatarContainer}>
-          <Text>Avatar:</Text>
-          <Image
-            source={{ uri: user.avatarUrl }}
-            style={styles.avatar}
-            resizeMode="cover"
-          />
-          <Text style={styles.avatarUrl}>{user.avatarUrl}</Text>
+      <View style={styles.avatarContainer}>
+        <View style={styles.avatarPreviewShadow}>
+          <View style={styles.avatarPreview}>
+            <Image source={BODY.find(b => b.id === user.avatar!.body)?.image} style={styles.avatarLayer} />
+            <Image source={CLOTHES.find(c => c.id === user.avatar!.clothes)?.image} style={styles.avatarLayer} />
+            <Image source={FACE.find(f => f.id === user.avatar!.face)?.image} style={styles.avatarLayer} />
+            <Image source={HAIR.find(h => h.id === user.avatar!.hair)?.image} style={styles.avatarLayer} />
+            {user.avatar!.facialHair && (
+              <Image source={FACIAL_HAIR.find(fh => fh.id === user.avatar!.facialHair)?.image} style={styles.avatarLayer} />
+            )}
+          </View>
         </View>
-      )}
+      </View>
+      <Text style={styles.header}>{user.username}</Text>
       {user.bio ? <Text style={styles.bio}>Bio: {user.bio}</Text> : null}
       <Text>
         Level: {getLevelFromXP(user.experiencePoints)}
@@ -88,83 +97,45 @@ export default function UserProfileScreen() {
       <Text>Total Books Read: {user.totalBooksRead}</Text>
       <Text>Total Pages Read: {user.totalPagesRead}</Text>
       <Text>Reading Streak: {user.readingStreak} days</Text>
-
-      <Text style={styles.sectionHeader}>Bags Owned:</Text>
-      {user.ownedBags.length > 0 ? (
-        user.ownedBags.map((bag, idx) => (
-          <Text key={idx}>- {bag.name}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
-      <Text style={styles.sectionHeader}>NightStands Owned:</Text>
-      {user.ownedNightStands.length > 0 ? (
-        user.ownedNightStands.map((ns, idx) => (
-          <Text key={idx}>- {ns.name}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
-      <Text style={styles.sectionHeader}>Shelves Owned:</Text>
-      {user.ownedShelves.length > 0 ? (
-        user.ownedShelves.map((shelf, idx) => (
-          <Text key={idx}>- {shelf.name}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
       <Text style={styles.sectionHeader}>Favorite Genres:</Text>
-      {user.favoriteGenres.length > 0 ? (
-        user.favoriteGenres.map((genre, idx) => (
-          <Text key={idx}>- {genre}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
-      {/* Add Genre Picker */}
-      <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 10 }}>
-        <Picker
-          selectedValue={selectedGenre}
-          style={{ flex: 1 }}
-          onValueChange={(itemValue: GenreType) => setSelectedGenre(itemValue)}
-        >
-          {GENRES.map(genre => (
-            <Picker.Item key={genre} label={genre} value={genre} />
-          ))}
-        </Picker>
-        <Button title="Add" onPress={handleAddGenre} />
+      <View style={styles.genreChipContainer}>
+        {user.favoriteGenres.length > 0 ? (
+          user.favoriteGenres.map((genre, idx) => (
+            <View key={idx} style={styles.genreChip}>
+              <Text style={styles.genreChipText}>{genre}</Text>
+            </View>
+          ))
+        ) : (
+          <Text style={styles.empty}>None</Text>
+        )}
       </View>
 
-      <Text style={styles.sectionHeader}>Preferred Languages:</Text>
-      {user.preferredLanguages.length > 0 ? (
-        user.preferredLanguages.map((lang, idx) => (
-          <Text key={idx}>- {lang}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
-      <Text style={styles.sectionHeader}>Badges:</Text>
-      {user.badges.length > 0 ? (
-        user.badges.map((badge, idx) => (
-          <Text key={idx}>- {badge}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
-      )}
-
-      <Text style={styles.sectionHeader}>Owned Skins:</Text>
-      <Text>Bag Skins:</Text>
-      {user.ownedSkins.bagSkins.length > 0 ? (
-        user.ownedSkins.bagSkins.map((skin, idx) => (
-          <Text key={idx}>- {skin.name}</Text>
-        ))
-      ) : (
-        <Text style={styles.empty}>None</Text>
+      <View style={styles.toggleGenreCardWrapper}>
+        <Button
+          title={showGenreCard ? 'Hide Genre Selection' : 'Add Genres'}
+          color="#007aff"
+          onPress={() => setShowGenreCard(prev => !prev)}
+        />
+      </View>
+      {showGenreCard && (
+        <View style={styles.genreCard}>
+          <Text style={styles.genreLabel}>Add a Genre</Text>
+          <View style={styles.genrePickerRow}>
+            <Picker
+              selectedValue={selectedGenre}
+              style={styles.genrePicker}
+              onValueChange={(itemValue: GenreType) => setSelectedGenre(itemValue)}
+              dropdownIconColor="#007aff"
+            >
+              {GENRES.map(genre => (
+                <Picker.Item key={genre} label={genre} value={genre} />
+              ))}
+            </Picker>
+            <View style={styles.addGenreButtonWrapper}>
+              <Button title="Add" color="#007aff" onPress={handleAddGenre} />
+            </View>
+          </View>
+        </View>
       )}
       <Text>NightStand Skins:</Text>
       {user.ownedSkins.nightStandSkins.length > 0 ? (
@@ -190,10 +161,92 @@ const styles = StyleSheet.create({
   container: { flexGrow: 1, padding: 20 },
   header: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
   center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  avatarContainer: { marginBottom: 10, alignItems: 'center' },
-  avatar: { width: 80, height: 80, borderRadius: 40, marginVertical: 5 },
-  avatarUrl: { fontSize: 12, color: 'gray' },
+  avatarContainer: { marginBottom: 18, alignItems: 'center' },
+  avatarPreviewShadow: {
+    backgroundColor: '#fff',
+    borderRadius: 80,
+    padding: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 4,
+  },
+  avatarPreview: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
+    position: 'relative',
+  },
+  avatarLayer: {
+    position: 'absolute',
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+  },
   bio: { marginBottom: 10 },
   sectionHeader: { marginTop: 15, fontWeight: 'bold' },
   empty: { color: 'gray', fontStyle: 'italic' },
+  genreChipContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 8,
+    gap: 6,
+  },
+  genreChip: {
+    backgroundColor: '#e6f0ff',
+    borderRadius: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    marginRight: 6,
+    marginBottom: 6,
+    borderWidth: 1,
+    borderColor: '#007aff',
+  },
+  genreChipText: {
+    color: '#007aff',
+    fontWeight: '600',
+    fontSize: 14,
+  },
+  genreCard: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 14,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 2,
+    marginBottom: 18,
+    marginTop: 4,
+  },
+  genreLabel: {
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginBottom: 8,
+    color: '#444',
+  },
+  genrePickerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  genrePicker: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 8,
+    color: '#222',
+    marginRight: 8,
+  },
+  addGenreButtonWrapper: {
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  toggleGenreCardWrapper: {
+    marginBottom: 8,
+    marginTop: 2,
+    alignSelf: 'flex-start',
+  },
 });

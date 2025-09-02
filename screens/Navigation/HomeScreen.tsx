@@ -45,7 +45,7 @@ return (
   }}
 />
       <Text style={styles.header}>My Bookshelf</Text>
-      <Button title="Profile" onPress={() => navigation.navigate('UserProfile')} />
+      <Button title="Library" onPress={() => navigation.navigate('UserProfile')} />
       <Button title="Add Book" onPress={() => navigation.navigate('AddBook')} />
 
       {visibleBooks.length === 0 && (

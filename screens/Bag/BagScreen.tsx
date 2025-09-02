@@ -54,9 +54,10 @@ export default function BagScreen() {
           data={books}
           keyExtractor={item => item.id}
           renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => { setSelectedBook(item); setModalVisible(true); }}>
-              <BookCard book={item} />
-            </TouchableOpacity>
+            <BookCard
+              book={item}
+              onPress={() => { setSelectedBook(item); setModalVisible(true); }}
+            />
           )}
         />
       )}

@@ -14,19 +14,18 @@ type AddBookScreenNavigationProp = NativeStackNavigationProp<RootStackParamList,
 export default function AddBookScreen() {
   const navigation = useNavigation<AddBookScreenNavigationProp>();
   const [title, setTitle] = useState('');
-  const [author, setAuthor] = useState('');
-  const [status, setStatus] = useState<'Want to Read' | 'Reading' | 'Read'>('Want to Read');
+  const [status, setStatus] = useState<'Bag' | 'Nightstand' | 'Shelf'>('Bag');
   const [selectedSearchResult, setSelectedSearchResult] = useState<any | null>(null);
 
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);
 
-  // Map the UI status to your BookStatus type
-  const statusMap: Record<typeof status, BookStatus> = {
-    'Want to Read': 'Bag',
-    'Reading': 'Nightstand',
-    'Read': 'Shelf',
-  };
+  // Map the UI label to your BookStatus type
+  const statusLabels: { label: string; value: BookStatus }[] = [
+    { label: 'Bag', value: 'Bag' },
+    { label: 'Nightstand', value: 'Nightstand' },
+    { label: 'Shelf', value: 'Shelf' },
+  ];
 
   const cheekyPhrases = [
     "You bookworm, you! 📚",
@@ -59,18 +58,18 @@ export default function AddBookScreen() {
 
   const handleSave = async () => {
     try {
-      if (!title.trim() || !author.trim()) {
-        alert('Please enter both title and author');
+      if (!title.trim()) {
+        alert('Please enter a title');
         return;
       }
 
       const now = new Date().toISOString();
-      const mappedStatus = statusMap[status];
+  const mappedStatus = status;
 
       const newBook: Book = {
         id: uuid.v4().toString(),
         title: title.trim(),
-        author: author.trim(),
+        author: selectedSearchResult?.authors?.[0] || '',
         status: mappedStatus,
         dateAdded: now,
         dateStarted: mappedStatus === 'Nightstand' ? now : undefined,
@@ -117,49 +116,200 @@ export default function AddBookScreen() {
 
   return (
     <View style={styles.container}>
-      <Button title="Test Toast" onPress={() => Toast.show({
-        type: 'success',
-        text1: "test",
-      })} />
-
-      <Text>Search:</Text>
-      <TextInput style={styles.input} value={title} onChangeText={(text) => { setTitle(text); searchBooks(text); }} placeholder="Book Title" />
-
-      {searching && <Text>Searching...</Text>}
-      {searchResults.length > 0 && (
-        <View style={{ marginBottom: 10 }}>
-          <Text>Search Results:</Text>
-          {searchResults.map(item => (
-            <Text
-              key={item.id}
-              style={{ padding: 5 }}
-              onPress={() => {
-                setTitle(item.volumeInfo.title || '');
-                setAuthor(item.volumeInfo.authors?.[0] || '');
-                setSelectedSearchResult(item.volumeInfo);
-                setSearchResults([]);
-              }}
+      <View style={styles.card}>
+        <Text style={styles.header}>Add a Book</Text>
+        <Text style={styles.label}>Search for a Book</Text>
+        <TextInput
+          style={styles.input}
+          value={title}
+          onChangeText={(text) => { setTitle(text); searchBooks(text); }}
+          placeholder="Book Title"
+          placeholderTextColor="#aaa"
+        />
+        {searching && <Text style={styles.searching}>Searching...</Text>}
+        {searchResults.length > 0 && (
+          <View style={styles.searchResultsContainer}>
+            <Text style={styles.searchResultsLabel}>Search Results:</Text>
+            {searchResults.map(item => (
+              <View key={item.id} style={styles.searchResultItem}>
+                <Text
+                  style={styles.searchResultTitle}
+                  onPress={() => {
+                    setTitle(item.volumeInfo.title || '');
+                    setSelectedSearchResult(item.volumeInfo);
+                    setSearchResults([]);
+                  }}
+                >
+                  {item.volumeInfo.title}
+                </Text>
+                {item.volumeInfo.authors && (
+                  <Text style={styles.searchResultAuthor}>by {item.volumeInfo.authors.join(', ')}</Text>
+                )}
+              </View>
+            ))}
+          </View>
+        )}
+        <Text style={styles.label}>Add to...</Text>
+        <View style={styles.statusButtons}>
+          {statusLabels.map(({ label, value }) => (
+            <View
+              key={value}
+              style={[styles.statusButton, status === value && styles.statusButtonSelected]}
             >
-              {item.volumeInfo.title} {item.volumeInfo.authors ? `by ${item.volumeInfo.authors.join(', ')}` : ''}
-            </Text>
+              <Text
+                style={[styles.statusButtonText, status === value && styles.statusButtonTextSelected]}
+                onPress={() => setStatus(value)}
+              >
+                {label}
+              </Text>
+            </View>
           ))}
         </View>
-      )}
-
-      <Text>Status:</Text>
-      <View style={styles.statusButtons}>
-        {(['Want to Read', 'Reading', 'Read'] as const).map((s) => (
-          <Button key={s} title={s} onPress={() => setStatus(s)} color={status === s ? 'blue' : 'gray'} />
-        ))}
+        <View style={styles.saveButtonWrapper}>
+          <Button title="Save Book" color="#007aff" onPress={handleSave} />
+        </View>
       </View>
-
-      <Button title="Save Book" onPress={handleSave} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  input: { borderWidth: 1, padding: 10, marginBottom: 10 },
-  statusButtons: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20 },
+  container: {
+    flex: 1,
+    backgroundColor: '#f7f8fa',
+    padding: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 22,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    width: '100%',
+    maxWidth: 400,
+    alignSelf: 'center',
+  },
+  header: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginBottom: 18,
+    color: '#222',
+    alignSelf: 'center',
+  },
+  label: {
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginBottom: 6,
+    color: '#444',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    backgroundColor: '#f5f5f5',
+    padding: 12,
+    borderRadius: 10,
+    marginBottom: 14,
+    fontSize: 16,
+    color: '#222',
+  },
+  searching: {
+    color: '#007aff',
+    marginBottom: 8,
+    fontStyle: 'italic',
+  },
+  searchResultsContainer: {
+    marginBottom: 12,
+    backgroundColor: '#f0f6ff',
+    borderRadius: 10,
+    padding: 8,
+  },
+  searchResultsLabel: {
+    fontWeight: 'bold',
+    marginBottom: 4,
+    color: '#007aff',
+  },
+  searchResultItem: {
+    marginBottom: 6,
+    padding: 6,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+    shadowColor: '#007aff',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  searchResultTitle: {
+    fontWeight: 'bold',
+    fontSize: 15,
+    color: '#222',
+  },
+  searchResultAuthor: {
+    fontSize: 13,
+    color: '#555',
+    marginTop: 2,
+  },
+  statusButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+    gap: 8,
+  },
+  statusButton: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: 'center',
+    marginHorizontal: 4,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    minWidth: 0,
+    minHeight: 48,
+    maxWidth: 120,
+    flexShrink: 1,
+    flexWrap: 'nowrap',
+    overflow: 'hidden',
+  },
+  statusButtonSelected: {
+    backgroundColor: '#e6f0ff',
+    borderColor: '#007aff',
+    shadowColor: '#007aff',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.10,
+    shadowRadius: 6,
+    elevation: 2,
+  },
+  // statusButtonIcon styles removed
+  statusButtonText: {
+    color: '#444',
+    fontWeight: '600',
+    fontSize: 15,
+    flexShrink: 1,
+    textAlign: 'center',
+    flexWrap: 'nowrap',
+    maxWidth: 80,
+  },
+  statusButtonTextSelected: {
+    color: '#007aff',
+    fontWeight: 'bold',
+  },
+  saveButtonWrapper: {
+    marginTop: 10,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#007aff',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 2,
+  },
 });
