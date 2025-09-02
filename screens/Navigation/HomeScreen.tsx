@@ -6,7 +6,9 @@ import { loadBooks } from '../../storage/bookStorage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
-
+import { removeBooks } from '../../storage/bookStorage';
+import { removeUserProfile } from '../../storage/userStorage';
+import { Alert } from 'react-native';
 type HomeScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Home'>;
 
 export default function HomeScreen() {
@@ -32,6 +34,16 @@ useEffect(() => {
 
 return (
     <View style={styles.container}>
+      <Button
+  title="Clear All Data"
+  color="#d9534f"
+  onPress={async () => {
+    await removeBooks();
+    await removeUserProfile();
+    setBooks([]);
+    Alert.alert('Data Cleared', 'All books and user data have been removed.');
+  }}
+/>
       <Text style={styles.header}>My Bookshelf</Text>
       <Button title="Profile" onPress={() => navigation.navigate('UserProfile')} />
       <Button title="Add Book" onPress={() => navigation.navigate('AddBook')} />

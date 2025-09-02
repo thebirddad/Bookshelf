@@ -1,4 +1,4 @@
-import { View, Text, FlatList, Button, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, FlatList, Button, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useEffect, useState } from 'react';
 import BookCard from '../../components/items/BookCard';
 import { Book, BookStatus } from '../../components/constants/types';
@@ -6,6 +6,7 @@ import { loadBooks, saveBooks } from '../../storage/bookStorage';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
+import BookModal from '../../components/modals/BookModal';
 
 type ShelfScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Shelf'>;
 
@@ -21,6 +22,9 @@ export default function ShelfScreen() {
   const navigation = useNavigation<ShelfScreenNavigationProp>();
   const [books, setBooks] = useState<Book[]>([]);
   const [showHidden, setShowHidden] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+  const [editRating, setEditRating] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', async () => {
@@ -72,13 +76,21 @@ export default function ShelfScreen() {
                 data={shelfBooks}
                 keyExtractor={item => item.id}
                 renderItem={({ item }) => (
-                  <BookCard
-                    book={item}
-                    isHidden={!!item.hidden}
-                    onHide={() => hideBook(item)}
-                    onUnhide={() => unhideBook(item)}
-                    showHidden={showHidden}
-                  />
+                  <TouchableOpacity
+                    onPress={() => {
+                      setSelectedBook(item);
+                      setEditRating(item.rating);
+                      setModalVisible(true);
+                    }}
+                  >
+                    <BookCard
+                      book={item}
+                      isHidden={!!item.hidden}
+                      onHide={() => hideBook(item)}
+                      onUnhide={() => unhideBook(item)}
+                      showHidden={showHidden}
+                    />
+                  </TouchableOpacity>
                 )}
                 horizontal
                 showsHorizontalScrollIndicator={false}
@@ -89,6 +101,31 @@ export default function ShelfScreen() {
           ))}
         </ScrollView>
       )}
+      <BookModal
+        visible={modalVisible}
+        book={selectedBook}
+        editRating={editRating}
+        editPagesRead={selectedBook?.pagesRead}
+        setEditRating={setEditRating}
+        setEditPagesRead={() => {}}
+        onSaveProgress={async () => {
+          if (selectedBook) {
+            const updatedBook = { ...selectedBook, rating: editRating };
+            const allBooks = await loadBooks();
+            const updatedBooks = allBooks.map(b => b.id === updatedBook.id ? updatedBook : b);
+            await saveBooks(updatedBooks);
+            setBooks(updatedBooks.filter(b => b.status === 'Shelf'));
+            setSelectedBook(updatedBook);
+            setModalVisible(false);
+          }
+        }}
+        onMoveToShelf={undefined}
+        onMoveToNightstand={undefined}
+        onMoveBackToBag={undefined}
+        onClose={() => setModalVisible(false)}
+        canEditRating={true}
+        canEditPagesRead={false}
+      />
     </View>
   );
 }
@@ -106,5 +143,4 @@ const styles = StyleSheet.create({
     marginTop: -10,
     marginBottom: 20,
   },
-  // shelfStack is no longer needed
 });

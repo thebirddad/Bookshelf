@@ -12,6 +12,6 @@ export async function loadUserProfile(): Promise<UserProfile | null> {
   return data ? JSON.parse(data) as UserProfile : null;
 }
 
-export async function clearUserProfile(): Promise<void> {
+export async function removeUserProfile() {
   await AsyncStorage.removeItem(USER_PROFILE_KEY);
 }

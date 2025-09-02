@@ -8,7 +8,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../../App';
 import Nightstand from '../../components/items/Nightstand';
 import NIGHTSTAND_SKINS from '../../components/constants/nightstandskins'; // adjust path as needed
-
+import BookModal from '../../components/modals/BookModal';
 
 type NightstandScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Nightstand'>;
 
@@ -122,123 +122,57 @@ export default function NightstandScreen() {
           contentContainerStyle={styles.bookRow}
         />
       </View>
-      <Modal
+      <BookModal
         visible={modalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <ScrollView contentContainerStyle={{ alignItems: 'center' }}>
-              {selectedBook && (
-                <>
-                  {selectedBook.coverImageUrl && (
-                    <Image
-                      source={{ uri: selectedBook.coverImageUrl }}
-                      style={styles.bookCover}
-                      resizeMode="contain"
-                    />
-                  )}
-                  <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 8 }}>
-                    {selectedBook.title}
-                  </Text>
-                  <Text style={{ marginBottom: 8 }}>{selectedBook.author}</Text>
-                  {selectedBook.synopsis && (
-                    <Text style={{ marginBottom: 8 }}>{selectedBook.synopsis}</Text>
-                  )}
-                  {selectedBook.genre && (
-                    <Text style={{ marginBottom: 4 }}>Genre: {selectedBook.genre}</Text>
-                  )}
-                  {selectedBook.publisher && (
-                    <Text style={{ marginBottom: 4 }}>Publisher: {selectedBook.publisher}</Text>
-                  )}
-                  {selectedBook.releaseDate && (
-                    <Text style={{ marginBottom: 4 }}>Release Date: {selectedBook.releaseDate}</Text>
-                  )}
-                  {selectedBook.language && (
-                    <Text style={{ marginBottom: 4 }}>Language: {selectedBook.language}</Text>
-                  )}
-                  {selectedBook.totalPages && (
-                    <Text style={{ marginBottom: 4 }}>Pages: {selectedBook.totalPages}</Text>
-                  )}
-                  {selectedBook.isbn && (
-                    <Text style={{ marginBottom: 4 }}>ISBN: {selectedBook.isbn}</Text>
-                  )}
-                  <Text style={{ marginBottom: 4 }}>Rating:</Text>
-                  <TextInput
-                    style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 6, padding: 6, marginBottom: 8, width: 80, textAlign: 'center' }}
-                    keyboardType="decimal-pad"
-                    value={editRating !== undefined ? String(editRating) : ''}
-                    onChangeText={text => setEditRating(text ? parseFloat(text) : undefined)}
-                    placeholder="1-5"
-                  />
-                  <Text style={{ marginBottom: 4 }}>Pages Read:</Text>
-                  <TextInput
-                    style={{ borderWidth: 1, borderColor: '#ccc', borderRadius: 6, padding: 6, marginBottom: 8, width: 80, textAlign: 'center' }}
-                    keyboardType="numeric"
-                    value={editPagesRead !== undefined ? String(editPagesRead) : ''}
-                    onChangeText={text => setEditPagesRead(Number(text))}
-                    placeholder="Pages"
-                  />
-                  <Button
-                    title="Save Progress"
-                    onPress={async () => {
-                      if (selectedBook) {
-                        const updatedBook = {
-                          ...selectedBook,
-                          rating: editRating,
-                          pagesRead: editPagesRead,
-                        };
-                        const allBooks = await loadBooks();
-                        const updatedBooks = allBooks.map(b => b.id === updatedBook.id ? updatedBook : b);
-                        await saveBooks(updatedBooks);
-                        setBooks(updatedBooks.filter(b => b.status === 'Nightstand'));
-                        setSelectedBook(updatedBook);
+        book={selectedBook}
+        editRating={editRating}
+        editPagesRead={editPagesRead}
+        setEditRating={setEditRating}
+        setEditPagesRead={setEditPagesRead}
+        onSaveProgress={async () => {
+          if (selectedBook) {
+            const updatedBook = {
+              ...selectedBook,
+              rating: editRating,
+              pagesRead: editPagesRead,
+            };
+            const allBooks = await loadBooks();
+            const updatedBooks = allBooks.map(b => b.id === updatedBook.id ? updatedBook : b);
+            await saveBooks(updatedBooks);
+            setBooks(updatedBooks.filter(b => b.status === 'Nightstand'));
+            setSelectedBook(updatedBook);
 
-                        // Update user's total pages read
-                        const user = await loadUserProfile();
-                        if (user) {
-                          // Find previous pagesRead for this book
-                          const prevBook = allBooks.find(b => b.id === updatedBook.id);
-                          const prevPages = prevBook?.pagesRead || 0;
-                          const newPages = editPagesRead || 0;
-                          const diff = newPages - prevPages;
-                          const updatedUser = {
-                            ...user,
-                            totalPagesRead: user.totalPagesRead + diff,
-                          };
-                          await saveUserProfile(updatedUser);
-                        }
-                      }
-                    }}
-                  />
-                  <Button
-                    title="Mark as Read (Move to Shelf)"
-                    onPress={() => {
-                      moveToShelf(selectedBook);
-                      setModalVisible(false);
-                      setSelectedBook(null);
-                    }}
-                  />
-                  <Button
-                    title="Move Back to Bag"
-                    onPress={() => {
-                      moveBackToBag(selectedBook);
-                      setModalVisible(false);
-                      setSelectedBook(null);
-                    }}
-                  />
-                  <Button
-                    title="Close"
-                    onPress={() => setModalVisible(false)}
-                  />
-                </>
-              )}
-            </ScrollView>
-          </View>
-        </View>
-      </Modal>
+            // Update user's total pages read
+            const user = await loadUserProfile();
+            if (user) {
+              const prevBook = allBooks.find(b => b.id === updatedBook.id);
+              const prevPages = prevBook?.pagesRead || 0;
+              const newPages = editPagesRead || 0;
+              const diff = newPages - prevPages;
+              const updatedUser = {
+                ...user,
+                totalPagesRead: user.totalPagesRead + diff,
+              };
+              await saveUserProfile(updatedUser);
+            }
+          }
+        }}
+        onMoveToShelf={() => {
+          if (selectedBook) {
+            moveToShelf(selectedBook);
+            setModalVisible(false);
+            setSelectedBook(null);
+          }
+        }}
+        onMoveBackToBag={() => {
+          if (selectedBook) {
+            moveBackToBag(selectedBook);
+            setModalVisible(false);
+            setSelectedBook(null);
+          }
+        }}
+        onClose={() => setModalVisible(false)}
+      />
       {books.length === 0 && (
         <Text style={styles.emptyMessage}>Your Nightstand is empty. Start reading!</Text>
       )}

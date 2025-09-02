@@ -26,3 +26,7 @@ export async function recalculateTotalPagesRead() {
 
   return shelfPages + nightstandPages;
 }
+
+export async function removeBooks() {
+  await AsyncStorage.removeItem(BOOKS_KEY);
+}
